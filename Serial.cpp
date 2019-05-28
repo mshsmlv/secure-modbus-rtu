@@ -33,6 +33,19 @@ void HardwareSerial::print(const char *str)
     UART_PrintStr(iNum, str);
 }
 
+size_t HardwareSerial::write(uint8_t* buffer, unsigned char size) {
+        //UART_WriteBuff(iNum, (char*)buffer, size);
+        unsigned char i;
+        char c;
+        for(i = 0; i < size; i++) {
+            c = (char)buffer[i];
+            printf("send %x\n", c);
+            UART_Write(iNum, c);
+            ProgramDelay(100);
+        }
+        return size;
+ };
+
 HardwareSerial Serial1(SERIAL1);
 HardwareSerial Serial2(SERIAL2);
 HardwareSerial Serial3(SERIAL3);

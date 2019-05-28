@@ -15,9 +15,19 @@ def get_serial_port():
 
     return port
 
+raw_message = "sensitive_data_sensitive_data_sensitive_data"
+
+array_message = []
+
+for i in range(0, len(raw_message), 2):
+    array_message.append((ord(raw_message[i]) << 8) | ord(raw_message[i+1]))
+
+for e in array_message:
+    print(hex(e))
 serial_port = get_serial_port()
 
-message = rtu.write_multiple_registers(slave_id=1, starting_address=1, values=[26, 25, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
+message = rtu.write_multiple_registers(slave_id=1, starting_address=1, values=array_message)
+print(message)
 
 response = rtu.send_message(message, serial_port)
 print("response", response)

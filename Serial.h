@@ -32,17 +32,7 @@ class HardwareSerial
     int read(void) { return UART_Read(iNum); };
     void flush(void) { UART_Flush(iNum); };
     size_t write(uint8_t c) {UART_Write(iNum, (char)c); return (size_t)1; };
-    inline size_t write(uint8_t* buffer, unsigned char size) {
-        unsigned char i;
-        char c;
-        for(i = 0; i < size; i++) {
-            c = (char)buffer[i];
-            printf("send %x\n", c);
-            UART_Write(iNum, c);
-            ProgramDelay(500);
-        }
-        return i;
-    };
+    size_t write(uint8_t* buffer, unsigned char size);
     inline size_t write(unsigned long n) { return write((uint8_t)n); }
     inline size_t write(long n) { return write((uint8_t)n); }
     inline size_t write(unsigned int n) { return write((uint8_t)n); }
