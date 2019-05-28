@@ -44,6 +44,9 @@ The lenght of this ADU is 8 bytes::
 """
 import struct
 
+from binascii import hexlify, unhexlify
+from Crypto.Cipher import AES
+
 from umodbus.client.serial.redundancy_check import get_crc, validate_crc
 from umodbus.functions import (create_function_from_response_pdu,
                                expected_response_pdu_size_from_request_pdu,
@@ -55,6 +58,9 @@ from umodbus.functions import (create_function_from_response_pdu,
 from umodbus.utils import recv_exactly
 
 
+IV = unhexlify('9ad03002000000009ad0300200000000')
+key = b'0123456789010123'
+
 def _create_request_adu(slave_id, req_pdu):
     """ Return request ADU for Modbus RTU.
 
@@ -62,7 +68,8 @@ def _create_request_adu(slave_id, req_pdu):
     :param req_pdu: Byte array with PDU.
     :return: Byte array with ADU.
     """
-    first_part_adu = struct.pack('>B', slave_id) + req_pdu
+    aes = AES.new(key, AES.MODE_CBC, IV)
+    first_part_adu = struct.pack('>B', slave_id) + aes.encrypt(req_pdu + b'\x00'*(16 - len(req_pdu)%16))
 
     return first_part_adu + get_crc(first_part_adu)
 
@@ -179,7 +186,9 @@ def parse_response_adu(resp_adu, req_adu=None):
     :param req_adu: Request ADU, default None.
     :return: Response data.
     """
-    resp_pdu = resp_adu[1:-2]
+    aes = AES.new(key, AES.MODE_CBC, IV)
+    resp_pdu = aes.decrypt(resp_adu[1:-2])
+
     validate_crc(resp_adu)
 
     req_pdu = None
@@ -187,18 +196,20 @@ def parse_response_adu(resp_adu, req_adu=None):
     if req_adu is not None:
         req_pdu = req_adu[1:-2]
 
+    aes = AES.new(key, AES.MODE_CBC, IV)
+    req_pdu = aes.decrypt(req_pdu)
+
     function = create_function_from_response_pdu(resp_pdu, req_pdu)
 
     return function.data
 
 
-def raise_for_exception_adu(resp_adu):
+def raise_for_exception_adu(resp_pdu):
     """ Check a response ADU for error
 
     :param resp_adu: Response ADU.
     :raises ModbusError: When a response contains an error code.
     """
-    resp_pdu = resp_adu[1:-2]
     pdu_to_function_code_or_raise_error(resp_pdu)
 
 
@@ -213,13 +224,18 @@ def send_message(adu, serial_port):
     serial_port.flush()
 
     # Check exception ADU (which is shorter than all other responses) first.
-    exception_adu_size = 5
+    exception_adu_size = 19
     response_error_adu = recv_exactly(serial_port.read, exception_adu_size)
-    raise_for_exception_adu(response_error_adu)
 
-    expected_response_size = \
-        expected_response_pdu_size_from_request_pdu(adu[1:-2]) + 3
-    response_remainder = recv_exactly(
-        serial_port.read, expected_response_size - exception_adu_size)
+    aes = AES.new(key, AES.MODE_CBC, IV) 
+    response_error_pdu = aes.decrypt(response_error_adu[1:-2])
+
+    aes = AES.new(key, AES.MODE_CBC, IV) 
+    req_pdu = aes.decrypt(adu[1:-2])
+
+    raise_for_exception_adu(response_error_pdu)
+
+    expected_response_size = expected_response_pdu_size_from_request_pdu(req_pdu) + 3
+    response_remainder = recv_exactly(serial_port.read, expected_response_size - exception_adu_size)
 
     return parse_response_adu(response_error_adu + response_remainder, adu)

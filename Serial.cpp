@@ -39,7 +39,7 @@ size_t HardwareSerial::write(uint8_t* buffer, unsigned char size) {
         char c;
         for(i = 0; i < size; i++) {
             c = (char)buffer[i];
-            printf("send %x\n", c);
+            printf("send %c\n", c);
             UART_Write(iNum, c);
             ProgramDelay(100);
         }

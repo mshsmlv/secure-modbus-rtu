@@ -105,7 +105,6 @@ def pdu_to_function_code_or_raise_error(resp_pdu):
     :raises ModbusError: When response contains error code.
     """
     function_code = struct.unpack('>B', resp_pdu[0:1])[0]
-
     if function_code not in function_code_to_function_map.keys():
         error_code = struct.unpack('>B', resp_pdu[1:2])[0]
         raise error_code_to_exception_map[error_code]
@@ -668,10 +667,10 @@ class ReadHoldingRegisters(ModbusFunction):
         :param value: Quantity.
         :raises: IllegalDataValueError.
         """
-        if not (1 <= value <= 0x007D):
+        if not (1 <= value <= 0x00FD):
             raise IllegalDataValueError('Quantify field of request must be a '
                                         'value between 0 and '
-                                        '{0}.'.format(0x007D))
+                                        '{0}.'.format(0x00FD))
 
         self._quantity = value
 
@@ -695,7 +694,8 @@ class ReadHoldingRegisters(ModbusFunction):
         :param pdu: A request PDU.
         :return: Instance of this class.
         """
-        _, starting_address, quantity = struct.unpack('>BHH', pdu)
+        starting_address = struct.unpack('>H', pdu[1:3])[0]
+        quantity = struct.unpack('>H', pdu[3:5])[0]
 
         instance = ReadHoldingRegisters()
         instance.starting_address = starting_address
@@ -709,7 +709,10 @@ class ReadHoldingRegisters(ModbusFunction):
 
         :return: number of bytes.
         """
-        return 2 + self.quantity * 2
+        expected_quantity = 2 + self.quantity  * 2
+        if expected_quantity % 16:
+            return expected_quantity + (16 - expected_quantity%16)
+        return expected_quantity
 
     def create_response_pdu(self, data):
         """ Create response pdu.
@@ -719,7 +722,6 @@ class ReadHoldingRegisters(ModbusFunction):
         """
         log.debug('Create multi bit response pdu {0}.'.format(data))
         fmt = '>BB' + conf.TYPE_CHAR * len(data)
-
         return struct.pack(fmt, self.function_code, len(data) * 2, *data)
 
     @staticmethod
@@ -733,12 +735,14 @@ class ReadHoldingRegisters(ModbusFunction):
         :return: Instance of :class:`ReadCoils`.
         """
         read_holding_registers = ReadHoldingRegisters()
-        read_holding_registers.quantity = struct.unpack('>H', req_pdu[-2:])[0]
+        read_holding_registers.quantity = struct.unpack('>H', req_pdu[3:5])[0]
         read_holding_registers.byte_count = \
             struct.unpack('>B', resp_pdu[1:2])[0]
-
-        fmt = '>' + (conf.TYPE_CHAR * read_holding_registers.quantity)
-        read_holding_registers.data = list(struct.unpack(fmt, resp_pdu[2:]))
+        read_holding_registers.data = []
+        for i in range(0, read_holding_registers.quantity, 2):
+            read_holding_registers.data.append(struct.unpack("<H", resp_pdu[2+i: 2+i + 2])[0])
+        #fmt = '>' + (conf.TYPE_CHAR * read_holding_registers.quantity)
+        #read_holding_registers.data = list(struct.unpack(fmt, resp_pdu[2:]))
 
         return read_holding_registers
 
@@ -1554,18 +1558,17 @@ class WriteMultipleRegisters(ModbusFunction):
         :param pdu: A request PDU.
         :return: Instance of this class.
         """
-        _, starting_address, quantity, byte_count = \
-            struct.unpack('>BHHB', pdu[:6])
+        _, starting_address, quantity, byte_count = struct.unpack('>BHHB', pdu[:6])
 
         # Values are 16 bit, so each value takes up 2 bytes.
         fmt = '>' + (conf.MULTI_BIT_VALUE_FORMAT_CHARACTER *
                      int((byte_count / 2)))
 
-        values = list(struct.unpack(fmt, pdu[6:]))
+        #values = list(struct.unpack(fmt, pdu[6:]))
 
         instance = WriteMultipleRegisters()
         instance.starting_address = starting_address
-        instance.values = values
+        #instance.values = values
 
         return instance
 
@@ -1575,7 +1578,7 @@ class WriteMultipleRegisters(ModbusFunction):
 
         :return: number of bytes.
         """
-        return 5
+        return 16
 
     def create_response_pdu(self):
         """ Create response pdu.
