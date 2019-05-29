@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# scripts/example/simple_rtu_client.py
 import fcntl
 import struct
 import time
