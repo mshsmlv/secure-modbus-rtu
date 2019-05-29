@@ -11,7 +11,7 @@ make CONF=Release
 
 ## Загрузка на плату
 ```
-sudo mstn-m100-client -d /home/maria/NetBeansProjects/MSTN_Project/hardware/dist/Release/GNU-Linux/hardware.bin
+sudo mstn-m100-client -d <full-path-to-directory>/hardware/dist/Release/GNU-Linux/hardware.bin
 ```
 
 ## Тестовое соединение
