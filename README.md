@@ -23,5 +23,6 @@ cd software/master
 ## Сбор трафика со стороны злоумышленика
 ```
 cd software/spy
-python3 test.py <serial port>
+./spy.py <serial port>
+./parse.py
 ```
