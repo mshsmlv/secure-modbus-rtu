@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import struct
 from umodbus.client.serial.redundancy_check import get_crc, validate_crc, CRCError
 
