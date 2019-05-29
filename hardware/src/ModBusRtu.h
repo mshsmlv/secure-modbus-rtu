@@ -1,4 +1,4 @@
-/**
+    /**
  * @file 	ModbusRtu.h
  * @version     1.21
  * @date        2016.02.21
@@ -40,6 +40,7 @@
 
 #include <inttypes.h>
 #include "Serial.h"
+#include "AES.h"
 #include "mstn_rtc.h"
 
 
@@ -54,6 +55,10 @@ typedef short unsigned int word;
 #define bitClear(value, bit)            ((value) &= ~(1UL << (bit)))
 #define bitRead(value, bit)             (((value) >> (bit)) & 0x01)
 #define bitWrite(value, bit, bitvalue)  (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
+
+AES aes;
+unsigned long long int iv = 36753562;
+byte key[] = "0123456789010123";
 
 /**
  * @struct modbus_t
@@ -156,7 +161,7 @@ const unsigned char fctsupported[] =
 };
 
 #define T35  20
-#define  MAX_BUFFER  64	//!< maximum size for the communication buffer in bytes
+#define  MAX_BUFFER  70	//!< maximum size for the communication buffer in bytes
 
 /**
  * @class Modbus
@@ -736,8 +741,6 @@ int8_t Modbus::poll()
  */
 int8_t Modbus::poll( uint16_t *regs, uint8_t u8size )
 {
-
-   // printf("poll\n");
     au16regs = regs;
     u8regsize = u8size;
     uint8_t u8current;
@@ -890,6 +893,24 @@ int8_t Modbus::getRxBuffer()
 void Modbus::sendTxBuffer()
 {
     printf("sendTxBuffer\n");
+    
+    int padedLength;
+    if (u8BufferSize % N_BLOCK) {
+        padedLength = u8BufferSize + (N_BLOCK - u8BufferSize % N_BLOCK);
+    } else {
+        padedLength = u8BufferSize;
+    }
+    byte cipher[padedLength];
+    byte setted_iv [N_BLOCK] ;
+    aes.set_IV(iv);
+    aes.get_IV(setted_iv);
+    aes.do_aes_encrypt((au8Buffer + 1), padedLength, cipher, key, 128, setted_iv);
+    for(int i = 0; i < padedLength; i++ ) {
+        au8Buffer[i+1] = cipher[i];
+        printf("cipher[%d] = %x\n", i, cipher[i]);
+    }
+    u8BufferSize = padedLength + 1;
+    
     // append CRC to message
     uint16_t u16crc = calcCRC( u8BufferSize );
     au8Buffer[ u8BufferSize ] = u16crc >> 8;
@@ -899,9 +920,7 @@ void Modbus::sendTxBuffer()
     
     printf("set to transmit mode\n");
     GPIO_DigitalWrite( u8txenpin, HIGH );
-    
-    au8Buffer[u8BufferSize] = 0;
-    port->write( au8Buffer, u8BufferSize );
+    port->write( au8Buffer, u8BufferSize);
     if (u8txenpin > 1)
     {
         // must wait transmission end before changing pin state
@@ -915,7 +934,7 @@ void Modbus::sendTxBuffer()
     }
     printf("write answer\n");
     for (int i = 0; i < u8BufferSize; i++) {
-        printf("[%d]", au8Buffer[i]);
+        printf("[%x]", au8Buffer[i]);
     }
     printf("\n");
     while(port->read() >= 0);
@@ -977,6 +996,15 @@ uint8_t Modbus::validateRequest()
     {
         u16errCnt ++;
         return NO_REPLY;
+    }
+    
+    byte plain[u8BufferSize - 3];
+    byte setted_iv [N_BLOCK] ;
+    aes.set_IV(iv);
+    aes.get_IV(setted_iv);
+    aes.do_aes_decrypt((au8Buffer + 1), (u8BufferSize - 3), plain, key, 128, setted_iv);
+    for(int i = 0; i < u8BufferSize - 3; i++ ) {
+        au8Buffer[i+1] = plain[i];
     }
 
     // check fct code

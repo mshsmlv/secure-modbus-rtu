@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <logicalFolder name="HeaderFiles"
+                   displayName="Header Files"
+                   projectFiles="true">
+      <itemPath>src/AES.h</itemPath>
+      <itemPath>src/ModBusRtu.h</itemPath>
+      <itemPath>src/Serial.h</itemPath>
+      <itemPath>src/aes_config.h</itemPath>
+      <itemPath>src/main.h</itemPath>
+    </logicalFolder>
+    <logicalFolder name="SourceFiles"
+                   displayName="Source Files"
+                   projectFiles="true">
+      <itemPath>src/AES.cpp</itemPath>
+      <itemPath>src/Serial.cpp</itemPath>
+      <itemPath>src/main.cpp</itemPath>
+      <itemPath>Startup/startup_mstn_MDR32F9Qx.S</itemPath>
+    </logicalFolder>
+    <logicalFolder name="TestFiles"
+                   displayName="Test Files"
+                   projectFiles="false"
+                   kind="TEST_LOGICAL_FOLDER">
+    </logicalFolder>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceRootList>
+    <Elem>/opt/Intec/MSTN/M100/Inc/Core</Elem>
+    <Elem>/opt/Intec/MSTN/M100/Inc/Device</Elem>
+    <Elem>/opt/Intec/MSTN/M100/Inc/MSTN</Elem>
+    <Elem>/opt/Intec/MSTN/M100/Inc/SPL_MDR</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Debug" type="1">
+      <toolsSet>
+        <compilerSet>arm-none-eabi|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <incDir>
+            <pElem>./Startup</pElem>
+            <pElem>./src</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/MSTN</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/SPL_MDR</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Cpp</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Core</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Device</pElem>
+            <pElem>./</pElem>
+          </incDir>
+          <commandLine>-mcpu=cortex-m3 -mthumb -gdwarf-2 -MD -Wall -O1 -fdata-sections -ffunction-sections</commandLine>
+          <preprocessorList>
+            <Elem>F_CPU=80000000</Elem>
+            <Elem>MSTN=100</Elem>
+            <Elem>USE_MDR1986VE9x</Elem>
+            <Elem>__MODE_USER</Elem>
+            <Elem>__NO_SYSTEM_INIT</Elem>
+            <Elem>__STARTUP_CLEAR_BSS</Elem>
+            <Elem>_start=mstn_main</Elem>
+          </preprocessorList>
+        </cTool>
+        <ccTool>
+          <incDir>
+            <pElem>./Startup</pElem>
+            <pElem>./src</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/MSTN</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/SPL_MDR</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Cpp</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Core</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Device</pElem>
+            <pElem>./</pElem>
+          </incDir>
+          <commandLine>-mcpu=cortex-m3 -mthumb -gdwarf-2 -MD -Wall -O1 -fdata-sections -ffunction-sections -fno-exceptions</commandLine>
+          <preprocessorList>
+            <Elem>F_CPU=80000000</Elem>
+            <Elem>MSTN=100</Elem>
+            <Elem>USE_MDR1986VE9x</Elem>
+            <Elem>__MODE_USER</Elem>
+            <Elem>__NO_SYSTEM_INIT</Elem>
+            <Elem>__STARTUP_CLEAR_BSS</Elem>
+            <Elem>_start=mstn_main</Elem>
+          </preprocessorList>
+        </ccTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>/opt/Intec/MSTN/M100/Lib/arm-none-eabi/</pElem>
+          </linkerAddLib>
+          <commandLine>-u _printf_float -mcpu=cortex-m3 -mthumb -lstdc++ -nostartfiles -lm -N -Ttext=0x08003000 -Tdata=0x20000000 --specs=nano.specs -Wl,--start-group -lgcc -lc -lm -lMSTN-M100 -Wl,--end-group -Wl,-gc-sections -ffreestanding -T/opt/Intec/MSTN/M100/Lib/arm-none-eabi/MSTN_M100_User.ld -Wl,--start-group -lgcc -lc -lm -lMSTN-M100 -Wl,--end-group</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="Startup/startup_mstn_MDR32F9Qx.S" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/AES.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/AES.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/ModBusRtu.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Serial.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Serial.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/aes_config.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/main.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+    <conf name="Release" type="1">
+      <toolsSet>
+        <compilerSet>GNU|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
+      </toolsSet>
+      <compileType>
+        <cTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>./Startup</pElem>
+            <pElem>./src</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/MSTN</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/SPL_MDR</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Cpp</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Core</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Device</pElem>
+            <pElem>./</pElem>
+          </incDir>
+          <commandLine>-mcpu=cortex-m3 -mthumb -MD -Wall -O2 -fdata-sections -ffunction-sections</commandLine>
+          <preprocessorList>
+            <Elem>F_CPU=80000000</Elem>
+            <Elem>MSTN=100</Elem>
+            <Elem>USE_MDR1986VE9x</Elem>
+            <Elem>__MODE_USER</Elem>
+            <Elem>__NO_SYSTEM_INIT</Elem>
+            <Elem>__STARTUP_CLEAR_BSS</Elem>
+            <Elem>_start=mstn_main</Elem>
+          </preprocessorList>
+        </cTool>
+        <ccTool>
+          <developmentMode>5</developmentMode>
+          <incDir>
+            <pElem>./Startup</pElem>
+            <pElem>./src</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/MSTN</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/SPL_MDR</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Cpp</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Core</pElem>
+            <pElem>/opt/Intec/MSTN/M100/Inc/Device</pElem>
+            <pElem>./</pElem>
+          </incDir>
+          <commandLine>-mcpu=cortex-m3 -mthumb -MD -Wall -O2 -fdata-sections -ffunction-sections -fno-exceptions</commandLine>
+          <preprocessorList>
+            <Elem>F_CPU=80000000</Elem>
+            <Elem>MSTN=100</Elem>
+            <Elem>USE_MDR1986VE9x</Elem>
+            <Elem>__MODE_USER</Elem>
+            <Elem>__NO_SYSTEM_INIT</Elem>
+            <Elem>__STARTUP_CLEAR_BSS</Elem>
+            <Elem>_start=mstn_main</Elem>
+          </preprocessorList>
+        </ccTool>
+        <fortranCompilerTool>
+          <developmentMode>5</developmentMode>
+        </fortranCompilerTool>
+        <asmTool>
+          <developmentMode>5</developmentMode>
+        </asmTool>
+        <linkerTool>
+          <linkerAddLib>
+            <pElem>/opt/Intec/MSTN/M100/Lib/arm-none-eabi/</pElem>
+          </linkerAddLib>
+          <commandLine>-u _printf_float -mcpu=cortex-m3 -mthumb -lstdc++ -nostartfiles -lm -N -Ttext=0x08003000 -Tdata=0x20000000 --specs=nano.specs -Wl,--start-group -lgcc -lc -lm -lMSTN-M100 -Wl,--end-group -Wl,-gc-sections -ffreestanding -T/opt/Intec/MSTN/M100/Lib/arm-none-eabi/MSTN_M100_User.ld -Wl,--start-group -lgcc -lc -lm -lMSTN-M100 -Wl,--end-group</commandLine>
+        </linkerTool>
+      </compileType>
+      <item path="Startup/startup_mstn_MDR32F9Qx.S" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/AES.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/AES.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/ModBusRtu.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/Serial.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/Serial.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/aes_config.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="src/main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="src/main.h" ex="false" tool="3" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
