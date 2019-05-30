@@ -14,7 +14,7 @@ def get_serial_port():
 
     return port
 
-raw_message = "sensitive_data_sensitive_data_sensitive_data"
+raw_message = "sensitive_data_sensitive_data_"
 
 array_message = []
 
@@ -32,9 +32,17 @@ response = rtu.send_message(message, serial_port)
 print("response", response)
 
 time.sleep(1)
-message = rtu.read_holding_registers(slave_id=1, starting_address=1, quantity=26)
+message = rtu.read_holding_registers(slave_id=1, starting_address=1, quantity=30)
 
 response = rtu.send_message(message, serial_port)
 print("response", response)
+
+restored_message = ""
+
+for i in response:
+    restored_message += chr(i & ((1 << 8) - 1))
+    restored_message += chr(i >> 8)
+
+print("restored message: ", restored_message)
 
 serial_port.close()
